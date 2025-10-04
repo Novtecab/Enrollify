@@ -1,0 +1,618 @@
+openapi: 3.0.3
+info:
+  title: UniApply Hub - Users API
+  description: User profile management and dashboard endpoints
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:3000/api
+    description: Development server
+  - url: https://api.uniapplyhub.com
+    description: Production server
+
+paths:
+  /users/profile:
+    get:
+      summary: Get user profile
+      description: Retrieve complete user profile information
+      tags:
+        - User Profile
+      security:
+        - accessToken: []
+      responses:
+        '200':
+          description: User profile retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  user:
+                    $ref: '#/components/schemas/CompleteUserProfile'
+        '401':
+          description: Unauthorized access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    put:
+      summary: Update user profile
+      description: Update user profile information
+      tags:
+        - User Profile
+      security:
+        - accessToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProfileUpdateRequest'
+      responses:
+        '200':
+          description: Profile updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Profile updated successfully"
+                  user:
+                    $ref: '#/components/schemas/CompleteUserProfile'
+        '400':
+          description: Invalid input data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /users/dashboard:
+    get:
+      summary: Get user dashboard data
+      description: Retrieve dashboard information including applications, documents, and notifications
+      tags:
+        - User Dashboard
+      security:
+        - accessToken: []
+      responses:
+        '200':
+          description: Dashboard data retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  dashboard:
+                    $ref: '#/components/schemas/DashboardData'
+        '401':
+          description: Unauthorized access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /users/profile/completion:
+    get:
+      summary: Get profile completion status
+      description: Retrieve detailed profile completion breakdown
+      tags:
+        - User Profile
+      security:
+        - accessToken: []
+      responses:
+        '200':
+          description: Profile completion status retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  completion:
+                    $ref: '#/components/schemas/ProfileCompletion'
+        '401':
+          description: Unauthorized access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /users/academic-background:
+    post:
+      summary: Add academic background entry
+      description: Add new academic background entry to user profile
+      tags:
+        - User Profile
+      security:
+        - accessToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AcademicBackgroundEntry'
+      responses:
+        '201':
+          description: Academic background entry added successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Academic background added successfully"
+                  entry:
+                    $ref: '#/components/schemas/AcademicBackgroundEntry'
+        '400':
+          description: Invalid input data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    put:
+      summary: Update academic background entry
+      description: Update existing academic background entry
+      tags:
+        - User Profile
+      security:
+        - accessToken: []
+      parameters:
+        - name: entryId
+          in: query
+          required: true
+          schema:
+            type: string
+          description: ID of the academic background entry to update
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AcademicBackgroundEntry'
+      responses:
+        '200':
+          description: Academic background entry updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Academic background updated successfully"
+        '404':
+          description: Academic background entry not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    delete:
+      summary: Delete academic background entry
+      description: Remove academic background entry from user profile
+      tags:
+        - User Profile
+      security:
+        - accessToken: []
+      parameters:
+        - name: entryId
+          in: query
+          required: true
+          schema:
+            type: string
+          description: ID of the academic background entry to delete
+      responses:
+        '200':
+          description: Academic background entry deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Academic background deleted successfully"
+        '404':
+          description: Academic background entry not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /users/work-experience:
+    post:
+      summary: Add work experience entry
+      description: Add new work experience entry to user profile
+      tags:
+        - User Profile
+      security:
+        - accessToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkExperienceEntry'
+      responses:
+        '201':
+          description: Work experience entry added successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Work experience added successfully"
+                  entry:
+                    $ref: '#/components/schemas/WorkExperienceEntry'
+
+components:
+  schemas:
+    CompleteUserProfile:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "64a7b8c9d1e2f3g4h5i6j7k8"
+        email:
+          type: string
+          format: email
+          example: "student@example.com"
+        personalInfo:
+          $ref: '#/components/schemas/PersonalInfo'
+        academicBackground:
+          type: array
+          items:
+            $ref: '#/components/schemas/AcademicBackgroundEntry'
+        workExperience:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkExperienceEntry'
+        skills:
+          type: array
+          items:
+            type: string
+          example: ["JavaScript", "Python", "Data Analysis"]
+        languages:
+          type: array
+          items:
+            $ref: '#/components/schemas/LanguageEntry'
+        contactPreferences:
+          $ref: '#/components/schemas/ContactPreferences'
+        profileCompletion:
+          $ref: '#/components/schemas/ProfileCompletion'
+        createdAt:
+          type: string
+          format: date-time
+          example: "2024-10-01T08:00:00Z"
+        lastLoginAt:
+          type: string
+          format: date-time
+          example: "2024-10-04T10:30:00Z"
+
+    PersonalInfo:
+      type: object
+      properties:
+        firstName:
+          type: string
+          example: "John"
+        lastName:
+          type: string
+          example: "Doe"
+        dateOfBirth:
+          type: string
+          format: date
+          example: "1995-05-15"
+        nationality:
+          type: string
+          example: "United States"
+        phone:
+          type: string
+          example: "+1-555-123-4567"
+        address:
+          $ref: '#/components/schemas/Address'
+
+    Address:
+      type: object
+      properties:
+        street:
+          type: string
+          example: "123 Main Street"
+        city:
+          type: string
+          example: "New York"
+        state:
+          type: string
+          example: "NY"
+        country:
+          type: string
+          example: "United States"
+        postalCode:
+          type: string
+          example: "10001"
+
+    AcademicBackgroundEntry:
+      type: object
+      required:
+        - institutionName
+        - degree
+      properties:
+        id:
+          type: string
+          example: "64a7b8c9d1e2f3g4h5i6j7k8"
+        institutionName:
+          type: string
+          example: "Stanford University"
+        degree:
+          type: string
+          example: "Bachelor of Science"
+        fieldOfStudy:
+          type: string
+          example: "Computer Science"
+        gpa:
+          type: number
+          minimum: 0
+          maximum: 4
+          example: 3.8
+        startDate:
+          type: string
+          format: date
+          example: "2020-09-01"
+        endDate:
+          type: string
+          format: date
+          example: "2024-06-15"
+        isCurrentlyEnrolled:
+          type: boolean
+          example: false
+
+    WorkExperienceEntry:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "64a7b8c9d1e2f3g4h5i6j7k8"
+        company:
+          type: string
+          example: "Tech Innovations Inc."
+        position:
+          type: string
+          example: "Software Engineering Intern"
+        description:
+          type: string
+          example: "Developed web applications using React and Node.js"
+        startDate:
+          type: string
+          format: date
+          example: "2023-06-01"
+        endDate:
+          type: string
+          format: date
+          example: "2023-08-31"
+        isCurrentPosition:
+          type: boolean
+          example: false
+
+    LanguageEntry:
+      type: object
+      properties:
+        language:
+          type: string
+          example: "Spanish"
+        proficiency:
+          type: string
+          enum: ["Basic", "Intermediate", "Advanced", "Native"]
+          example: "Advanced"
+
+    ContactPreferences:
+      type: object
+      properties:
+        emailNotifications:
+          type: boolean
+          example: true
+        smsNotifications:
+          type: boolean
+          example: false
+        marketingEmails:
+          type: boolean
+          example: false
+
+    ProfileCompletion:
+      type: object
+      properties:
+        personalInfo:
+          type: boolean
+          example: true
+        academicBackground:
+          type: boolean
+          example: true
+        documents:
+          type: boolean
+          example: false
+        contactPreferences:
+          type: boolean
+          example: true
+        overallCompletion:
+          type: number
+          minimum: 0
+          maximum: 100
+          example: 75
+
+    DashboardData:
+      type: object
+      properties:
+        profileCompletion:
+          $ref: '#/components/schemas/ProfileCompletion'
+        applications:
+          $ref: '#/components/schemas/ApplicationsSummary'
+        documents:
+          $ref: '#/components/schemas/DocumentsSummary'
+        notifications:
+          $ref: '#/components/schemas/NotificationsSummary'
+        upcomingDeadlines:
+          type: array
+          items:
+            $ref: '#/components/schemas/DeadlineItem'
+
+    ApplicationsSummary:
+      type: object
+      properties:
+        total:
+          type: number
+          example: 5
+        draft:
+          type: number
+          example: 2
+        submitted:
+          type: number
+          example: 2
+        underReview:
+          type: number
+          example: 1
+        accepted:
+          type: number
+          example: 0
+        rejected:
+          type: number
+          example: 0
+
+    DocumentsSummary:
+      type: object
+      properties:
+        total:
+          type: number
+          example: 8
+        categories:
+          type: object
+          properties:
+            cv:
+              type: number
+              example: 1
+            transcript:
+              type: number
+              example: 2
+            recommendation:
+              type: number
+              example: 3
+            other:
+              type: number
+              example: 2
+
+    NotificationsSummary:
+      type: object
+      properties:
+        unread:
+          type: number
+          example: 3
+        total:
+          type: number
+          example: 15
+
+    DeadlineItem:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: ["application", "document"]
+          example: "application"
+        universityName:
+          type: string
+          example: "Harvard University"
+        programName:
+          type: string
+          example: "Master of Computer Science"
+        deadline:
+          type: string
+          format: date-time
+          example: "2024-12-01T23:59:59Z"
+        daysRemaining:
+          type: number
+          example: 45
+
+    ProfileUpdateRequest:
+      type: object
+      properties:
+        personalInfo:
+          $ref: '#/components/schemas/PersonalInfo'
+        skills:
+          type: array
+          items:
+            type: string
+        languages:
+          type: array
+          items:
+            $ref: '#/components/schemas/LanguageEntry'
+        contactPreferences:
+          $ref: '#/components/schemas/ContactPreferences'
+
+    Error:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              example: "VALIDATION_ERROR"
+            message:
+              type: string
+              example: "Invalid input data"
+            details:
+              type: array
+              items:
+                type: object
+                properties:
+                  field:
+                    type: string
+                    example: "email"
+                  message:
+                    type: string
+                    example: "Valid email address is required"
+
+  securitySchemes:
+    accessToken:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT access token for API authentication
+
+security:
+  - accessToken: []

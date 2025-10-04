@@ -1,0 +1,486 @@
+openapi: 3.0.3
+info:
+  title: UniApply Hub - Universities API
+  description: University search and program discovery endpoints
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:3000/api
+    description: Development server
+  - url: https://api.uniapplyhub.com
+    description: Production server
+
+paths:
+  /universities:
+    get:
+      summary: Search universities
+      description: Search and filter universities by various criteria
+      tags:
+        - Universities
+      parameters:
+        - name: search
+          in: query
+          schema:
+            type: string
+          description: Search term for university name
+          example: "Stanford"
+        - name: country
+          in: query
+          schema:
+            type: string
+          description: Filter by country
+          example: "USA"
+        - name: region
+          in: query
+          schema:
+            type: string
+            enum: ["Europe", "USA", "GCC", "Pakistan"]
+          description: Filter by region
+          example: "USA"
+        - name: field
+          in: query
+          schema:
+            type: string
+          description: Filter by field of study
+          example: "Computer Science"
+        - name: level
+          in: query
+          schema:
+            type: string
+            enum: ["Bachelors", "Masters", "PhD", "Certificate"]
+          description: Filter by program level
+          example: "Masters"
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+          description: Page number for pagination
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 20
+          description: Number of results per page
+        - name: sortBy
+          in: query
+          schema:
+            type: string
+            enum: ["name", "ranking", "deadline"]
+            default: "name"
+          description: Sort results by field
+        - name: sortOrder
+          in: query
+          schema:
+            type: string
+            enum: ["asc", "desc"]
+            default: "asc"
+          description: Sort order
+      responses:
+        '200':
+          description: Universities retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  universities:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/UniversitySummary'
+                  pagination:
+                    $ref: '#/components/schemas/PaginationInfo'
+                  filters:
+                    $ref: '#/components/schemas/AvailableFilters'
+        '400':
+          description: Invalid query parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /universities/{universityId}:
+    get:
+      summary: Get university details
+      description: Retrieve detailed information about a specific university
+      tags:
+        - Universities
+      parameters:
+        - name: universityId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: University ID
+          example: "64a7b8c9d1e2f3g4h5i6j7k8"
+      responses:
+        '200':
+          description: University details retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  university:
+                    $ref: '#/components/schemas/UniversityDetails'
+        '404':
+          description: University not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /universities/{universityId}/programs:
+    get:
+      summary: Get university programs
+      description: Retrieve all programs offered by a specific university
+      tags:
+        - Universities
+      parameters:
+        - name: universityId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: University ID
+        - name: level
+          in: query
+          schema:
+            type: string
+            enum: ["Bachelors", "Masters", "PhD", "Certificate"]
+          description: Filter programs by level
+        - name: field
+          in: query
+          schema:
+            type: string
+          description: Filter programs by field of study
+      responses:
+        '200':
+          description: University programs retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  programs:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Program'
+        '404':
+          description: University not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /universities/filters:
+    get:
+      summary: Get available filter options
+      description: Retrieve all available filter options for university search
+      tags:
+        - Universities
+      responses:
+        '200':
+          description: Filter options retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  filters:
+                    $ref: '#/components/schemas/AvailableFilters'
+
+components:
+  schemas:
+    UniversitySummary:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "64a7b8c9d1e2f3g4h5i6j7k8"
+        name:
+          type: string
+          example: "Stanford University"
+        country:
+          type: string
+          example: "USA"
+        region:
+          type: string
+          example: "USA"
+        city:
+          type: string
+          example: "Stanford, CA"
+        ranking:
+          type: object
+          properties:
+            global:
+              type: number
+              example: 3
+            national:
+              type: number
+              example: 2
+        programCount:
+          type: number
+          example: 45
+        nearestDeadline:
+          type: string
+          format: date-time
+          example: "2024-12-01T23:59:59Z"
+        fieldsOfStudy:
+          type: array
+          items:
+            type: string
+          example: ["Computer Science", "Engineering", "Business", "Medicine"]
+
+    UniversityDetails:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "64a7b8c9d1e2f3g4h5i6j7k8"
+        name:
+          type: string
+          example: "Stanford University"
+        country:
+          type: string
+          example: "USA"
+        region:
+          type: string
+          example: "USA"
+        website:
+          type: string
+          example: "https://www.stanford.edu"
+        description:
+          type: string
+          example: "A leading research university known for academic excellence and innovation"
+        establishedYear:
+          type: number
+          example: 1885
+        ranking:
+          type: object
+          properties:
+            global:
+              type: number
+              example: 3
+            national:
+              type: number
+              example: 2
+            source:
+              type: string
+              example: "QS World University Rankings 2024"
+        location:
+          type: object
+          properties:
+            city:
+              type: string
+              example: "Stanford"
+            state:
+              type: string
+              example: "California"
+            coordinates:
+              type: object
+              properties:
+                latitude:
+                  type: number
+                  example: 37.4275
+                longitude:
+                  type: number
+                  example: -122.1697
+        contactInfo:
+          type: object
+          properties:
+            admissionsEmail:
+              type: string
+              example: "admission@stanford.edu"
+            phone:
+              type: string
+              example: "+1-650-723-2091"
+            address:
+              type: string
+              example: "450 Serra Mall, Stanford, CA 94305"
+        statistics:
+          type: object
+          properties:
+            totalPrograms:
+              type: number
+              example: 45
+            totalApplications:
+              type: number
+              example: 1250
+            averageGPA:
+              type: number
+              example: 3.8
+        programs:
+          type: array
+          items:
+            $ref: '#/components/schemas/Program'
+
+    Program:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "64a7b8c9d1e2f3g4h5i6j7k8"
+        name:
+          type: string
+          example: "Master of Science in Computer Science"
+        level:
+          type: string
+          enum: ["Bachelors", "Masters", "PhD", "Certificate"]
+          example: "Masters"
+        department:
+          type: string
+          example: "Computer Science Department"
+        fieldsOfStudy:
+          type: array
+          items:
+            type: string
+          example: ["Computer Science", "Artificial Intelligence", "Software Engineering"]
+        duration:
+          type: object
+          properties:
+            years:
+              type: number
+              example: 2
+            months:
+              type: number
+              example: 0
+        requirements:
+          type: object
+          properties:
+            minGPA:
+              type: number
+              example: 3.5
+            languageRequirements:
+              type: array
+              items:
+                type: string
+              example: ["TOEFL 100+", "IELTS 7.0+"]
+            standardizedTests:
+              type: array
+              items:
+                type: string
+              example: ["GRE General", "GRE Subject (CS)"]
+            documents:
+              type: array
+              items:
+                type: string
+              example: ["Transcripts", "CV", "Statement of Purpose", "3 Letters of Recommendation"]
+        deadlines:
+          type: object
+          properties:
+            applicationDeadline:
+              type: string
+              format: date-time
+              example: "2024-12-01T23:59:59Z"
+            documentDeadline:
+              type: string
+              format: date-time
+              example: "2024-12-15T23:59:59Z"
+            decisionDate:
+              type: string
+              format: date-time
+              example: "2025-03-15T12:00:00Z"
+        fees:
+          type: object
+          properties:
+            tuition:
+              type: number
+              example: 58080
+            application:
+              type: number
+              example: 125
+            currency:
+              type: string
+              example: "USD"
+        isActive:
+          type: boolean
+          example: true
+
+    PaginationInfo:
+      type: object
+      properties:
+        currentPage:
+          type: number
+          example: 1
+        totalPages:
+          type: number
+          example: 5
+        totalItems:
+          type: number
+          example: 89
+        itemsPerPage:
+          type: number
+          example: 20
+        hasNextPage:
+          type: boolean
+          example: true
+        hasPreviousPage:
+          type: boolean
+          example: false
+
+    AvailableFilters:
+      type: object
+      properties:
+        countries:
+          type: array
+          items:
+            type: string
+          example: ["USA", "UK", "Canada", "Germany", "Australia", "Pakistan"]
+        regions:
+          type: array
+          items:
+            type: string
+          example: ["Europe", "USA", "GCC", "Pakistan"]
+        fieldsOfStudy:
+          type: array
+          items:
+            type: string
+          example: ["Computer Science", "Engineering", "Business", "Medicine", "Law"]
+        levels:
+          type: array
+          items:
+            type: string
+          example: ["Bachelors", "Masters", "PhD", "Certificate"]
+
+    Error:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              example: "VALIDATION_ERROR"
+            message:
+              type: string
+              example: "Invalid query parameters"
+            details:
+              type: array
+              items:
+                type: object
+                properties:
+                  field:
+                    type: string
+                    example: "page"
+                  message:
+                    type: string
+                    example: "Page number must be a positive integer"
