@@ -1,0 +1,55 @@
+import React, { createContext, useContext } from 'react';
+import toast, { Toaster } from 'react-hot-toast';
+
+const NotificationContext = createContext();
+
+export const useNotification = () => {
+  const context = useContext(NotificationContext);
+  if (!context) {
+    throw new Error('useNotification must be used within a NotificationProvider');
+  }
+  return context;
+};
+
+export const NotificationProvider = ({ children }) => {
+  const showSuccess = (message) => {
+    toast.success(message);
+  };
+
+  const showError = (message) => {
+    toast.error(message);
+  };
+
+  const showInfo = (message) => {
+    toast(message);
+  };
+
+  const value = {
+    showSuccess,
+    showError,
+    showInfo,
+  };
+
+  return (
+    <NotificationContext.Provider value={value}>
+      {children}
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 4000,
+          style: {
+            background: '#363636',
+            color: '#fff',
+          },
+          success: {
+            duration: 3000,
+            theme: {
+              primary: 'green',
+              secondary: 'black',
+            },
+          },
+        }}
+      />
+    </NotificationContext.Provider>
+  );
+};
